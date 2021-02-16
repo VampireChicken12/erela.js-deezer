@@ -146,7 +146,7 @@ export class Deezer extends Plugin {
   private async getAlbumTracks(id: string): Promise<Result> {
     const { data: album } = await Axios.get<Album>(`${BASE_URL}/album/${id}`);
     const tracks = album.tracks.items
-      .map((item) => (item.name ? Deezer.convertToUnresolved(item) : null))
+      .map((item) => (item.title ? Deezer.convertToUnresolved(item) : null))
       .filter((item) => item !== null);
     let next = album.tracks.next,
       page = 1;
@@ -159,7 +159,7 @@ export class Deezer extends Plugin {
       const { data: nextPage } = await Axios.get<AlbumTracks>(next);
       tracks.push(
         ...nextPage.items
-          .map((item) => (item.name ? Deezer.convertToUnresolved(item) : null))
+          .map((item) => (item.title ? Deezer.convertToUnresolved(item) : null))
           .filter((item) => item !== null)
       );
       next = nextPage.next;
@@ -175,7 +175,7 @@ export class Deezer extends Plugin {
     );
     const tracks = playlist.tracks.items
       .map((item) =>
-        item.track.name ? Deezer.convertToUnresolved(item.track) : null
+        item.track.title ? Deezer.convertToUnresolved(item.track) : null
       )
       .filter((item) => item !== null);
     let next = playlist.tracks.next,
@@ -190,7 +190,7 @@ export class Deezer extends Plugin {
       tracks.push(
         ...nextPage.items
           .map((item) =>
-            item.track.name ? Deezer.convertToUnresolved(item.track) : null
+            item.track.title ? Deezer.convertToUnresolved(item.track) : null
           )
           .filter((item) => item !== null)
       );
@@ -212,23 +212,23 @@ export class Deezer extends Plugin {
   private static convertToUnresolved(track: DeezerTrack): UnresolvedQuery {
     if (!track)
       throw new ReferenceError("The Deezer track object was not provided");
-    if (!track.artists)
-      throw new ReferenceError("The track artists array was not provided");
-    if (!track.name)
-      throw new ReferenceError("The track name was not provided");
-    if (!Array.isArray(track.artists))
+    if (!track.artist)
+      throw new ReferenceError("The track artist array was not provided");
+    if (!track.title)
+      throw new ReferenceError("The track title was not provided");
+    if (!Array.isArray(track.artist))
       throw new TypeError(
-        `The track artists must be an array, received type ${typeof track.artists}`
+        `The track artists must be an array, received type ${typeof track.artist}`
       );
-    if (typeof track.name !== "string")
+    if (typeof track.title !== "string")
       throw new TypeError(
-        `The track name must be a string, received type ${typeof track.name}`
+        `The track name must be a string, received type ${typeof track.title}`
       );
 
     return {
-      title: track.name,
-      author: track.artists[0].name,
-      duration: track.duration_ms,
+      title: track.title,
+      author: track.artist,
+      duration: track.duration * 1000,
     };
   }
 }
@@ -279,9 +279,9 @@ export interface PlaylistTracks {
 }
 
 export interface DeezerTrack {
-  artists: Artist[];
-  name: string;
-  duration_ms: number;
+  artist: Artist[];
+  title: string;
+  duration: number;
 }
 
 export interface SearchResult {
