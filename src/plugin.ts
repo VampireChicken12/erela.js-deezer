@@ -216,10 +216,6 @@ export class Deezer extends Plugin {
       throw new ReferenceError("The track artist array was not provided");
     if (!track.title)
       throw new ReferenceError("The track title was not provided");
-    if (!Array.isArray(track.artist))
-      throw new TypeError(
-        `The track artists must be an array, received type ${typeof track.artist}`
-      );
     if (typeof track.title !== "string")
       throw new TypeError(
         `The track name must be a string, received type ${typeof track.title}`
