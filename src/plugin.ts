@@ -145,60 +145,31 @@ export class Deezer extends Plugin {
 
   private async getAlbumTracks(id: string): Promise<Result> {
     const { data: album } = await Axios.get<Album>(`${BASE_URL}/album/${id}`);
-    const tracks = album.tracks.items
+    const tracks = album.tracks.data
       .map((item) => (item.title ? Deezer.convertToUnresolved(item) : null))
       .filter((item) => item !== null);
-    let next = album.tracks.next,
-      page = 1;
 
-    while (
-      next && !this.options.playlistLimit
-        ? true
-        : page < this.options.albumLimit
-    ) {
-      const { data: nextPage } = await Axios.get<AlbumTracks>(next);
-      tracks.push(
-        ...nextPage.items
-          .map((item) => (item.title ? Deezer.convertToUnresolved(item) : null))
-          .filter((item) => item !== null)
-      );
-      next = nextPage.next;
-      page++;
-    }
-
-    return { tracks, name: album.name ? album.name : "Untitled album" };
+    return {
+      tracks: this.options.albumLimit
+        ? tracks.splice(0, this.options.albumLimit)
+        : tracks,
+      name: album.name ? album.name : "Untitled album",
+    };
   }
 
   private async getPlaylistTracks(id: string): Promise<Result> {
     let { data: playlist } = await Axios.get<Playlist>(
       `${BASE_URL}/playlist/${id}`
     );
-    const tracks = playlist.tracks.items
+    const tracks = playlist.tracks.data
       .map((item) =>
         item.track.title ? Deezer.convertToUnresolved(item.track) : null
       )
       .filter((item) => item !== null);
-    let next = playlist.tracks.next,
-      page = 1;
-
-    while (
-      next && !this.options.playlistLimit
-        ? true
-        : page < this.options.playlistLimit
-    ) {
-      const { data: nextPage } = await Axios.get<PlaylistTracks>(next);
-      tracks.push(
-        ...nextPage.items
-          .map((item) =>
-            item.track.title ? Deezer.convertToUnresolved(item.track) : null
-          )
-          .filter((item) => item !== null)
-      );
-      next = nextPage.next;
-      page++;
-    }
     return {
-      tracks,
+      tracks: this.options.playlistLimit
+        ? tracks.splice(0, this.options.playlistLimit)
+        : tracks,
       name: playlist.name ? playlist.name : "Untitled playlist",
     };
   }
@@ -223,7 +194,7 @@ export class Deezer extends Plugin {
 
     return {
       title: track.title,
-      author: track.artist,
+      author: track.artist.name,
       duration: track.duration * 1000,
     };
   }
@@ -252,12 +223,7 @@ export interface Album {
 }
 
 export interface AlbumTracks {
-  items: DeezerTrack[];
-  next: string | null;
-}
-
-export interface Artist {
-  name: string;
+  data: DeezerTrack[];
 }
 
 export interface Playlist {
@@ -266,16 +232,17 @@ export interface Playlist {
 }
 
 export interface PlaylistTracks {
-  items: [
+  data: [
     {
       track: DeezerTrack;
     }
   ];
-  next: string | null;
 }
 
 export interface DeezerTrack {
-  artist: Artist[];
+  artist: {
+    name: string;
+  };
   title: string;
   duration: number;
 }

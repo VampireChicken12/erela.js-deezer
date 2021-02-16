@@ -1,6 +1,6 @@
 #Modules and Dist
 node_modules
 dist
-
+debug.log
 #We really don't need this :P
 yarn.lock
