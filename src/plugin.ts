@@ -162,15 +162,13 @@ export class Deezer extends Plugin {
       `${BASE_URL}/playlist/${id}`
     );
     const tracks = playlist.tracks.data
-      .map((item) =>
-        item.track.title ? Deezer.convertToUnresolved(item.track) : null
-      )
+      .map((item) => (item.title ? Deezer.convertToUnresolved(item) : null))
       .filter((item) => item !== null);
     return {
       tracks: this.options.playlistLimit
         ? tracks.splice(0, this.options.playlistLimit)
         : tracks,
-      name: playlist.name ? playlist.name : "Untitled playlist",
+      name: playlist.title ? playlist.title : "Untitled playlist",
     };
   }
 
@@ -228,15 +226,11 @@ export interface AlbumTracks {
 
 export interface Playlist {
   tracks: PlaylistTracks;
-  name: string;
+  title: string;
 }
 
 export interface PlaylistTracks {
-  data: [
-    {
-      track: DeezerTrack;
-    }
-  ];
+  data: [DeezerTrack];
 }
 
 export interface DeezerTrack {
