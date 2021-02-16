@@ -27,34 +27,33 @@ export interface Result {
   tracks: UnresolvedQuery[];
   name?: string;
 }
+
 export interface Album {
   name: string;
   tracks: AlbumTracks;
 }
+
 export interface AlbumTracks {
-  items: DeezerTrack[];
-  next: string | null;
+  data: DeezerTrack[];
 }
-export interface Artist {
-  name: string;
-}
+
 export interface Playlist {
   tracks: PlaylistTracks;
-  name: string;
+  title: string;
 }
+
 export interface PlaylistTracks {
-  items: [
-    {
-      track: DeezerTrack;
-    }
-  ];
-  next: string | null;
+  data: [DeezerTrack];
 }
+
 export interface DeezerTrack {
-  artist: Artist[];
+  artist: {
+    name: string;
+  };
   title: string;
   duration: number;
 }
+
 export interface SearchResult {
   exception?: {
     severity: string;
