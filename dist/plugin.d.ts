@@ -32,26 +32,23 @@ export interface Album {
     tracks: AlbumTracks;
 }
 export interface AlbumTracks {
-    items: DeezerTrack[];
-    next: string | null;
-}
-export interface Artist {
-    name: string;
+    data: DeezerTrack[];
 }
 export interface Playlist {
     tracks: PlaylistTracks;
     name: string;
 }
 export interface PlaylistTracks {
-    items: [
+    data: [
         {
             track: DeezerTrack;
         }
     ];
-    next: string | null;
 }
 export interface DeezerTrack {
-    artist: Artist[];
+    artist: {
+        name: string;
+    };
     title: string;
     duration: number;
 }

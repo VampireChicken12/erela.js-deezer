@@ -107,42 +107,27 @@ class Deezer extends erela_js_1.Plugin {
     getAlbumTracks(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const { data: album } = yield axios_1.default.get(`${BASE_URL}/album/${id}`);
-            const tracks = album.tracks.items
+            const tracks = album.tracks.data
                 .map((item) => (item.title ? Deezer.convertToUnresolved(item) : null))
                 .filter((item) => item !== null);
-            let next = album.tracks.next, page = 1;
-            while (next && !this.options.playlistLimit
-                ? true
-                : page < this.options.albumLimit) {
-                const { data: nextPage } = yield axios_1.default.get(next);
-                tracks.push(...nextPage.items
-                    .map((item) => (item.title ? Deezer.convertToUnresolved(item) : null))
-                    .filter((item) => item !== null));
-                next = nextPage.next;
-                page++;
-            }
-            return { tracks, name: album.name ? album.name : "Untitled album" };
+            return {
+                tracks: this.options.albumLimit
+                    ? tracks.splice(0, this.options.albumLimit)
+                    : tracks,
+                name: album.name ? album.name : "Untitled album",
+            };
         });
     }
     getPlaylistTracks(id) {
         return __awaiter(this, void 0, void 0, function* () {
             let { data: playlist } = yield axios_1.default.get(`${BASE_URL}/playlist/${id}`);
-            const tracks = playlist.tracks.items
+            const tracks = playlist.tracks.data
                 .map((item) => item.track.title ? Deezer.convertToUnresolved(item.track) : null)
                 .filter((item) => item !== null);
-            let next = playlist.tracks.next, page = 1;
-            while (next && !this.options.playlistLimit
-                ? true
-                : page < this.options.playlistLimit) {
-                const { data: nextPage } = yield axios_1.default.get(next);
-                tracks.push(...nextPage.items
-                    .map((item) => item.track.title ? Deezer.convertToUnresolved(item.track) : null)
-                    .filter((item) => item !== null));
-                next = nextPage.next;
-                page++;
-            }
             return {
-                tracks,
+                tracks: this.options.playlistLimit
+                    ? tracks.splice(0, this.options.playlistLimit)
+                    : tracks,
                 name: playlist.name ? playlist.name : "Untitled playlist",
             };
         });
@@ -165,7 +150,7 @@ class Deezer extends erela_js_1.Plugin {
             throw new TypeError(`The track name must be a string, received type ${typeof track.title}`);
         return {
             title: track.title,
-            author: track.artist,
+            author: track.artist.name,
             duration: track.duration * 1000,
         };
     }
