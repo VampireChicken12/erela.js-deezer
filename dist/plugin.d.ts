@@ -36,14 +36,10 @@ export interface AlbumTracks {
 }
 export interface Playlist {
     tracks: PlaylistTracks;
-    name: string;
+    title: string;
 }
 export interface PlaylistTracks {
-    data: [
-        {
-            track: DeezerTrack;
-        }
-    ];
+    data: [DeezerTrack];
 }
 export interface DeezerTrack {
     artist: {

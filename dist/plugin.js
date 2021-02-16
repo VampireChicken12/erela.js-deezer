@@ -122,13 +122,13 @@ class Deezer extends erela_js_1.Plugin {
         return __awaiter(this, void 0, void 0, function* () {
             let { data: playlist } = yield axios_1.default.get(`${BASE_URL}/playlist/${id}`);
             const tracks = playlist.tracks.data
-                .map((item) => item.track.title ? Deezer.convertToUnresolved(item.track) : null)
+                .map((item) => (item.title ? Deezer.convertToUnresolved(item) : null))
                 .filter((item) => item !== null);
             return {
                 tracks: this.options.playlistLimit
                     ? tracks.splice(0, this.options.playlistLimit)
                     : tracks,
-                name: playlist.name ? playlist.name : "Untitled playlist",
+                name: playlist.title ? playlist.title : "Untitled playlist",
             };
         });
     }
